@@ -5,6 +5,7 @@
  */
 package com.distribuidos.sd12015gui;
 
+import com.distribuidos.sd12015.data.ClaseConError;
 import com.distribuidos.sd12015.data.ClaseConOk;
 import com.distribuidos.sd12015.models.Huesped;
 import com.thoughtworks.xstream.XStream;
@@ -123,7 +124,7 @@ public class HuespedsGUI extends javax.swing.JDialog {
                                         conn.setRequestProperty("Accept", "text/xml");  // Pedimos formato xml
                                         conn.setRequestMethod("POST");
 
-                                        String params = "nif=" + nif;
+                                        String params = "huesped.NIF=" + nif;
                                         conn.setDoOutput(true);
                                         DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
                                         wr.writeBytes(params);
@@ -135,8 +136,17 @@ public class HuespedsGUI extends javax.swing.JDialog {
                                         if (codigo_http / 100 != 2) {
                                             System.out.println("Error HTTP " + codigo_http);
                                         } else {
-                                            ClaseConOk ok = (ClaseConOk) miStream.fromXML(is);
-                                            System.out.println(ok.isOk());
+                                            Object o = miStream.fromXML(is);
+                                            if (o instanceof ClaseConOk) {
+                                                ClaseConOk ok = (ClaseConOk) o;
+                                                if (ok.isOk()) {
+
+                                                    updateTable();
+                                                }
+                                            } else if (o instanceof ClaseConError) {
+                                                ClaseConError error = (ClaseConError) o;
+                                                System.out.println(error.getMensajeError());
+                                            }
                                         }
                                     } catch (MalformedURLException ex) {
                                         Logger.getLogger(HuespedsGUI.class.getName()).log(Level.SEVERE, null, ex);
