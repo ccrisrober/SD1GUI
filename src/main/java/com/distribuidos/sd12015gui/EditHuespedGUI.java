@@ -5,6 +5,7 @@
  */
 package com.distribuidos.sd12015gui;
 
+import com.distribuidos.sd12015.Common;
 import com.distribuidos.sd12015.data.ClaseConError;
 import com.distribuidos.sd12015.data.ClaseConOk;
 import com.distribuidos.sd12015.models.Huesped;
@@ -16,6 +17,10 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -29,7 +34,7 @@ public class EditHuespedGUI extends javax.swing.JDialog {
 
     protected String oldnif;
     protected Huesped hh = null;
-    
+
     /**
      * Creates new form EditHuespedGUI
      */
@@ -45,9 +50,9 @@ public class EditHuespedGUI extends javax.swing.JDialog {
             int codigo_http;
             url = new URL(main.DOMAIN + "VerHuesped?NIF=" + oldnif);
             conn = (HttpURLConnection) url.openConnection();
-            
+
             conn.setRequestProperty("Accept", "text/xml");  // Pedimos formato xml
-            
+
             is = conn.getInputStream();
             codigo_http = conn.getResponseCode();
             if (codigo_http / 100 != 2) {
@@ -56,33 +61,26 @@ public class EditHuespedGUI extends javax.swing.JDialog {
                 Object o = miStream.fromXML(is);
                 try {
                     hh = (Huesped) o;
-                    
+
                     this.nif.setText(hh.getNIF());
                     this.name.setText(hh.getNombre());
                     this.surname.setText(hh.getApellidos());
-                    /*this.date.setText(hh.getNacimiento().toString());
+                    try {
+                        String res = Common.dateToStr(hh.getNacimiento());
+                        this.date.setText(res);
+                    } catch (ParseException ex) {
+                        Logger.getLogger(EditHuespedGUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     this.phone.setText(hh.getTelefonoFijo());
                     this.mobile.setText(hh.getTelefonoMovil());
                     this.email.setText(hh.getEmail());
                     this.province.setText(hh.getDomicilio().getProvincia());
                     this.locality.setText(hh.getDomicilio().getLocalidad());
                     this.cp.setText(hh.getDomicilio().getCodigoPostal()+"");
-                    this.direction.setText(hh.getDomicilio().getDireccion());*/
-                    
+                    this.direction.setText(hh.getDomicilio().getDireccion());
+
                     System.out.println(hh);
-                    /*if (hh == null) {
-                        System.err.println("ERROR");
-                    } else {
-                        System.out.println(hh);
-                    }
-                    System.out.println("¿Quieres editar (E) o borrar (B)?");
-                    String delUpd = sc.next();
-                    if(delUpd.equalsIgnoreCase("E")) {
-                        // TODO: Editamos
-                    } else if (delUpd.equalsIgnoreCase("B")) {
-                        // TODO: Borramos
-                    }*/
-                } catch(ClassCastException ex) {
+                } catch (ClassCastException ex) {
                     ClaseConError err = (ClaseConError) o;
                     System.out.println(err.getCodigoError() + " - " + err.getMensajeError());
                 }
@@ -115,7 +113,6 @@ public class EditHuespedGUI extends javax.swing.JDialog {
         jLabel4 = new javax.swing.JLabel();
         surname = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
-        date = new javax.swing.JFormattedTextField();
         jPanel2 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         direction = new javax.swing.JTextField();
@@ -135,6 +132,7 @@ public class EditHuespedGUI extends javax.swing.JDialog {
         email = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
+        date = new javax.swing.JFormattedTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -260,6 +258,8 @@ public class EditHuespedGUI extends javax.swing.JDialog {
             }
         });
 
+        date.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -342,72 +342,113 @@ public class EditHuespedGUI extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     XStream miStream = new XStream();
-    
+
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        this.jButton1.setEnabled(false);
-        try {
-            URL url;
-            HttpURLConnection conn;
-            InputStream is;
-            int codigo_http;
 
-            url = new URL(DOMAIN + "EditarHuesped");
+        // TODO: Validar los campos
+        List<String> errors = new LinkedList<String>();
+        if (nif.getText().isEmpty()) {
+            errors.add("Inserta NIF");
+        }
+        if (name.getText().isEmpty()) {
+            errors.add("Inserta nombre");
+        }
+        if (surname.getText().isEmpty()) {
+            errors.add("Inserta apellido");
+        }
+        if (date.getText().isEmpty()) {
+            errors.add("Inserta nacimiento");
+        } else {
+            try {
+                Common.strToDate(date.getText());
+            } catch (ParseException ex) {
+                errors.add("Fecha incorrecta");
+            }
+        }
+        if (direction.getText().isEmpty()) {
+            errors.add("Inserta dirección");
+        }
+        if (locality.getText().isEmpty()) {
+            errors.add("Inserta localidad");
+        }
+        if (cp.getText().isEmpty()) {
+            errors.add("Inserta Código Postal");
+        }
+        if (province.getText().isEmpty()) {
+            errors.add("Inserta provincia");
+        }
+        if (!errors.isEmpty()) {
+            JOptionPane.showMessageDialog(null, errors.toArray());
+        } else {
+            this.jButton1.setEnabled(false);
+            try {
+                URL url;
+                HttpURLConnection conn;
+                InputStream is;
+                int codigo_http;
 
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("Accept", "text/xml");  // Pedimos formato xml
-            conn.setRequestMethod("POST");
+                url = new URL(DOMAIN + "EditarHuesped");
 
-            String params
-            = "huesped.nombre=" + name.getText()
-            + "&huesped.apellidos=" + surname.getText()
-            + "&huesped.NIF=" + nif.getText();
-            /* + "&huesped.nacimiento=" + date_;/* +
-            "&huesped.apellidos=" + surname +
-            "&huesped.apellidos=" + surname +
-            "&huesped.apellidos=" + surname +
-            "&huesped.apellidos=" + surname;*/
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestProperty("Accept", "text/xml");  // Pedimos formato xml
+                conn.setRequestMethod("POST");
 
-            // Send post request
-            conn.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-            wr.writeBytes(params);
-            wr.flush();
-            wr.close();
+                String params
+                        = "huesped.oldnif" + oldnif
+                        + "&huesped.nombre=" + name.getText()
+                        + "&huesped.apellidos=" + surname.getText()
+                        + "&huesped.NIF=" + nif.getText()
+                        + "&huesped.nacimiento=" + date.getText()
+                        + "&huesped.domicilio.direccion=" + direction.getText()
+                        + "&huesped.domicilio.localidad=" + locality.getText()
+                        + "&huesped.domicilio.codigoPostal=" + cp.getText()
+                        + "&huesped.domicilio.provincia=" + province.getText()
+                        + "&huesped.telefonoFijo=" + phone.getText()
+                        + "&huesped.telefonoMovil=" + mobile.getText()
+                        + "&huesped.email=" + email.getText();
 
-            is = conn.getInputStream();
-            codigo_http = conn.getResponseCode();
-            if (codigo_http / 100 != 2) {
-                System.out.println("Error HTTP " + codigo_http);
-            } else {
-                Object o = miStream.fromXML(is);
-                if (o instanceof ClaseConError) {
-                    JOptionPane.showMessageDialog(null, "No se ha podido crear.");
-                    System.out.println("No se ha podido crear.");
-                    this.jButton1.setEnabled(true);
+                // Send post request
+                conn.setDoOutput(true);
+                DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+                wr.writeBytes(params);
+                wr.flush();
+                wr.close();
+
+                is = conn.getInputStream();
+                codigo_http = conn.getResponseCode();
+                if (codigo_http / 100 != 2) {
+                    System.out.println("Error HTTP " + codigo_http);
                 } else {
-                    ClaseConOk ok = (ClaseConOk) o;
-                    if (ok.isOk()) {
-                        JOptionPane.showMessageDialog(null, "Agregado con éxito.");
-                        System.out.println("Agregado con éxito.");
-                        this.dispose();
-                    } else {
+                    Object o = miStream.fromXML(is);
+                    if (o instanceof ClaseConError) {
                         JOptionPane.showMessageDialog(null, "No se ha podido crear.");
                         System.out.println("No se ha podido crear.");
                         this.jButton1.setEnabled(true);
+                    } else {
+                        ClaseConOk ok = (ClaseConOk) o;
+                        if (ok.isOk()) {
+                            JOptionPane.showMessageDialog(null, "Agregado con éxito.");
+                            System.out.println("Agregado con éxito.");
+                            this.dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "No se ha podido crear.");
+                            System.out.println("No se ha podido crear.");
+                            this.jButton1.setEnabled(true);
+                        }
                     }
                 }
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(AddHuespedGUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(AddHuespedGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(AddHuespedGUI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(AddHuespedGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        
+
         this.dispose();
-        
+
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**

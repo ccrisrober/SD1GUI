@@ -5,6 +5,7 @@
  */
 package com.distribuidos.sd12015gui;
 
+import com.distribuidos.sd12015.Common;
 import com.distribuidos.sd12015.data.ClaseConError;
 import com.distribuidos.sd12015.data.ClaseConOk;
 import static com.distribuidos.sd12015gui.main.DOMAIN;
@@ -15,6 +16,9 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -51,7 +55,6 @@ public class AddHuespedGUI extends javax.swing.JDialog {
         surname = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        date = new javax.swing.JFormattedTextField();
         jPanel2 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         direction = new javax.swing.JTextField();
@@ -69,6 +72,7 @@ public class AddHuespedGUI extends javax.swing.JDialog {
         movil = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
         email = new javax.swing.JTextField();
+        date = new javax.swing.JFormattedTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -187,6 +191,8 @@ public class AddHuespedGUI extends javax.swing.JDialog {
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
+        date.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -267,68 +273,104 @@ public class AddHuespedGUI extends javax.swing.JDialog {
     XStream miStream = new XStream();
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        this.jButton1.setEnabled(false);
-        try {
-            URL url;
-            HttpURLConnection conn;
-            InputStream is;
-            int codigo_http;
-            
-            url = new URL(DOMAIN + "AniadirHuesped");
-            
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("Accept", "text/xml");  // Pedimos formato xml
-            conn.setRequestMethod("POST");
-            
-            String params
-                    = "huesped.nombre=" + name.getText()
-                    + "&huesped.apellidos=" + surname.getText()
-                    + "&huesped.NIF=" + nif.getText()
-                    + "&huesped.nacimiento=" + date.getText()
-                    + "&huesped.domicilio.direccion=" + direction.getText()
-                    + "&huesped.domicilio.localidad=" + localidad.getText()
-                    + "&huesped.domicilio.codigoPostal=" + cp.getText()
-                    + "&huesped.domicilio.provincia=" + provincia.getText()
-                    + "&huesped.telefonoFijo=" + fijo.getText()
-                    + "&huesped.telefonoMovil=" + movil.getText()
-                    + "&huesped.email=" + email.getText();
-            
-            // Send post request
-            conn.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-            wr.writeBytes(params);
-            wr.flush();
-            wr.close();
-            
-            is = conn.getInputStream();
-            codigo_http = conn.getResponseCode();
-            if (codigo_http / 100 != 2) {
-                System.out.println("Error HTTP " + codigo_http);
-            } else {
-                Object o = miStream.fromXML(is);
-                if (o instanceof ClaseConError) {
-                    JOptionPane.showMessageDialog(null, "No se ha podido crear.");
-                    System.out.println("No se ha podido crear.");
-                    this.jButton1.setEnabled(true);
+
+        // TODO: Validar los campos
+        List<String> errors = new LinkedList<String>();
+        if (nif.getText().isEmpty()) {
+            errors.add("Inserta NIF");
+        }
+        if (name.getText().isEmpty()) {
+            errors.add("Inserta nombre");
+        }
+        if (surname.getText().isEmpty()) {
+            errors.add("Inserta apellido");
+        }
+        if (date.getText().isEmpty()) {
+            errors.add("Inserta nacimiento");
+        } else {
+            try {
+                Common.strToDate(date.getText());
+            } catch (ParseException ex) {
+                errors.add("Fecha incorrecta");
+            }
+        }
+        if (direction.getText().isEmpty()) {
+            errors.add("Inserta dirección");
+        }
+        if (localidad.getText().isEmpty()) {
+            errors.add("Inserta localidad");
+        }
+        if (cp.getText().isEmpty()) {
+            errors.add("Inserta Código Postal");
+        }
+        if (provincia.getText().isEmpty()) {
+            errors.add("Inserta provincia");
+        }
+        if (!errors.isEmpty()) {
+            JOptionPane.showMessageDialog(null, errors.toArray());
+        } else {
+            this.jButton1.setEnabled(false);
+            try {
+                URL url;
+                HttpURLConnection conn;
+                InputStream is;
+                int codigo_http;
+
+                url = new URL(DOMAIN + "AniadirHuesped");
+
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestProperty("Accept", "text/xml");  // Pedimos formato xml
+                conn.setRequestMethod("POST");
+
+                String params
+                        = "huesped.nombre=" + name.getText()
+                        + "&huesped.apellidos=" + surname.getText()
+                        + "&huesped.NIF=" + nif.getText()
+                        + "&huesped.nacimiento=" + date.getText()
+                        + "&huesped.domicilio.direccion=" + direction.getText()
+                        + "&huesped.domicilio.localidad=" + localidad.getText()
+                        + "&huesped.domicilio.codigoPostal=" + cp.getText()
+                        + "&huesped.domicilio.provincia=" + provincia.getText()
+                        + "&huesped.telefonoFijo=" + fijo.getText()
+                        + "&huesped.telefonoMovil=" + movil.getText()
+                        + "&huesped.email=" + email.getText();
+
+                // Send post request
+                conn.setDoOutput(true);
+                DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+                wr.writeBytes(params);
+                wr.flush();
+                wr.close();
+
+                is = conn.getInputStream();
+                codigo_http = conn.getResponseCode();
+                if (codigo_http / 100 != 2) {
+                    System.out.println("Error HTTP " + codigo_http);
                 } else {
-                    ClaseConOk ok = (ClaseConOk) o;
-                    if (ok.isOk()) {
-                        JOptionPane.showMessageDialog(null, "Agregado con éxito.");
-                        System.out.println("Agregado con éxito.");
-                        this.dispose();
-                    } else {
+                    Object o = miStream.fromXML(is);
+                    if (o instanceof ClaseConError) {
                         JOptionPane.showMessageDialog(null, "No se ha podido crear.");
                         System.out.println("No se ha podido crear.");
                         this.jButton1.setEnabled(true);
+                    } else {
+                        ClaseConOk ok = (ClaseConOk) o;
+                        if (ok.isOk()) {
+                            JOptionPane.showMessageDialog(null, "Agregado con éxito.");
+                            System.out.println("Agregado con éxito.");
+                            this.dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "No se ha podido crear.");
+                            System.out.println("No se ha podido crear.");
+                            this.jButton1.setEnabled(true);
+                        }
                     }
                 }
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(AddHuespedGUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(AddHuespedGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(AddHuespedGUI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(AddHuespedGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

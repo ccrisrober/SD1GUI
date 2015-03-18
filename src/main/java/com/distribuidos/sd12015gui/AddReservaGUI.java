@@ -6,8 +6,12 @@
 package com.distribuidos.sd12015gui;
 
 import com.distribuidos.sd12015.Common;
+import com.distribuidos.sd12015.data.ClaseConError;
+import com.distribuidos.sd12015.data.ClaseConOk;
 import com.distribuidos.sd12015.models.Huesped;
+import static com.distribuidos.sd12015gui.main.DOMAIN;
 import com.thoughtworks.xstream.XStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -15,9 +19,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -179,26 +185,113 @@ public class AddReservaGUI extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        try {
-            // TODO add your handling code here:
-            
-            int index = this.huespedsBox.getSelectedIndex();
-            Huesped h = huespeds.get(index);
-            System.out.println(h);
-            
-            String dateInit = this.fechaInicio.getText();
-            String dateFinish = this.fechaSalida.getText();
-            Date fechaInit = Common.strToDate(dateInit);
-            Date fechaFinish = Common.strToDate(dateFinish);
-            
-            System.out.println(fechaInit);
-            System.out.println(fechaFinish);
-            
-            // TODO
-        } catch (ParseException ex) {
-            Logger.getLogger(AddReservaGUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
 
+        // TODO: Validar los campos
+        boolean checkInit = false, checkFinal = false;
+        List<String> errors = new LinkedList<String>();
+        if (fechaInicio.getText().isEmpty()) {
+            errors.add("Inserta fecha nacimiento");
+        } else {
+            try {
+                Common.strToDate(fechaInicio.getText());
+                checkInit = true;
+            } catch (ParseException ex) {
+                errors.add("Fecha entrada incorrecta");
+            }
+        }
+        if (fechaSalida.getText().isEmpty()) {
+            errors.add("Inserta fecha salida");
+        } else {
+            try {
+                Common.strToDate(fechaSalida.getText());
+                checkFinal = true;
+            } catch (ParseException ex) {
+                errors.add("Fecha salida incorrecta");
+            }
+        }
+        if(checkInit && checkFinal) {
+            try {
+                if(Common.strToDate(fechaSalida.getText()).
+                        compareTo(Common.strToDate(fechaInicio.getText())) > 0) {
+                    errors.add("Fecha de inicio debe ser antes que la de salida");
+                }
+            } catch (ParseException ex) {
+                Logger.getLogger(AddReservaGUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if (!errors.isEmpty()) {
+            JOptionPane.showMessageDialog(null, errors.toArray());
+        } else {
+            try {
+            // TODO add your handling code here:
+
+                int index = this.huespedsBox.getSelectedIndex();
+                Huesped h = huespeds.get(index);
+                System.out.println(h);
+
+                String dateInit = this.fechaInicio.getText();
+                String dateFinish = this.fechaSalida.getText();
+                Date fechaInit = Common.strToDate(dateInit);
+                Date fechaFinish = Common.strToDate(dateFinish);
+
+                System.out.println(fechaInit);
+                System.out.println(fechaFinish);
+                
+                this.jButton1.setEnabled(false);
+                URL url;
+                HttpURLConnection conn;
+                InputStream is;
+                int codigo_http;
+
+                url = new URL(DOMAIN + "AniadirReserva");
+
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestProperty("Accept", "text/xml");  // Pedimos formato xml
+                conn.setRequestMethod("POST");
+
+                String params
+                        = "reserva.fechaInicio=" + Common.dateToStr(fechaInit)
+                        + "&reserva.fechaSalida=" + Common.dateToStr(fechaFinish)
+                        + "&reserva.NIF=" + h.getNIF();
+
+                // Send post request
+                conn.setDoOutput(true);
+                DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+                wr.writeBytes(params);
+                wr.flush();
+                wr.close();
+
+                is = conn.getInputStream();
+                codigo_http = conn.getResponseCode();
+                if (codigo_http / 100 != 2) {
+                    System.out.println("Error HTTP " + codigo_http);
+                } else {
+                    Object o = miStream.fromXML(is);
+                    if (o instanceof ClaseConError) {
+                        JOptionPane.showMessageDialog(null, "No se ha podido crear.");
+                        System.out.println("No se ha podido crear.");
+                        this.jButton1.setEnabled(true);
+                    } else {
+                        ClaseConOk ok = (ClaseConOk) o;
+                        if (ok.isOk()) {
+                            JOptionPane.showMessageDialog(null, "Agregado con éxito.");
+                            System.out.println("Agregado con éxito.");
+                            this.dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "No se ha podido crear.");
+                            System.out.println("No se ha podido crear.");
+                            this.jButton1.setEnabled(true);
+                        }
+                    }
+                }
+            } catch (ParseException ex) {
+                Logger.getLogger(AddReservaGUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(AddReservaGUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(AddReservaGUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
