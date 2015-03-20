@@ -212,7 +212,7 @@ public class AddReservaGUI extends javax.swing.JDialog {
         if(checkInit && checkFinal) {
             try {
                 if(Common.strToDate(fechaSalida.getText()).
-                        compareTo(Common.strToDate(fechaInicio.getText())) > 0) {
+                        compareTo(Common.strToDate(fechaInicio.getText())) < 0) {
                     errors.add("Fecha de inicio debe ser antes que la de salida");
                 }
             } catch (ParseException ex) {

@@ -278,6 +278,8 @@ public class AddHuespedGUI extends javax.swing.JDialog {
         List<String> errors = new LinkedList<String>();
         if (nif.getText().isEmpty()) {
             errors.add("Inserta NIF");
+        } else if(nif.getText().length() != 9) {
+            errors.add("El NIF tiene que tener 9 caracteres");
         }
         if (name.getText().isEmpty()) {
             errors.add("Inserta nombre");
