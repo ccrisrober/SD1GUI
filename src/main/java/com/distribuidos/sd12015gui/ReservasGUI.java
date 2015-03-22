@@ -95,7 +95,6 @@ public class ReservasGUI extends javax.swing.JDialog {
                     return;
                 }
                 if (e.isPopupTrigger() && e.getComponent() instanceof JTable) {
-                    System.out.println("ola k ase?");
                     JPopupMenu popup = new JPopupMenu();
                     ActionListener menuListener = new ActionListener() {
                         @Override

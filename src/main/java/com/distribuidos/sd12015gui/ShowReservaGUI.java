@@ -43,7 +43,7 @@ public class ShowReservaGUI extends javax.swing.JDialog {
             HttpURLConnection conn;
             InputStream is;
             int codigo_http;
-            url = new URL(main.DOMAIN + "VerReserva?NIF=" + nif + "&fechaInicio=" + Common.dateToStr(date));
+            url = new URL(main.DOMAIN + "VerReserva?NIF=" + nif_ + "&fechaInicio=" + Common.dateToStr(date));
             conn = (HttpURLConnection) url.openConnection();
 
             conn.setRequestProperty("Accept", "text/xml");  // Pedimos formato xml

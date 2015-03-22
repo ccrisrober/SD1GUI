@@ -36,6 +36,7 @@ public class EditReservaGUI extends javax.swing.JDialog {
 
     List<Huesped> huespeds = null;
     String nif;
+    int habitacion;
     int index;
 
     /**
@@ -55,7 +56,7 @@ public class EditReservaGUI extends javax.swing.JDialog {
         InputStream is;
         int codigo_http;
         try {
-            url = new URL(main.DOMAIN + "VerReserva?NIF=" + nif_ + "fechaInicio=" + Common.dateToStr(date));
+            url = new URL(main.DOMAIN + "VerReserva?NIF=" + nif_ + "&fechaInicio=" + Common.dateToStr(date));
             conn = (HttpURLConnection) url.openConnection();
 
             conn.setRequestProperty("Accept", "text/xml");  // Pedimos formato xml
@@ -69,6 +70,10 @@ public class EditReservaGUI extends javax.swing.JDialog {
                 try {
                     Reserva rr = (Reserva) o;
                     System.out.println(rr);
+                    
+                    this.fechaInicio.setText(Common.dateToStr(rr.getFechaEntrada()));
+                    this.fechaSalida.setText(Common.dateToStr(rr.getFechaSalida()));
+                    habitacion = rr.getHabitacion();
 
                 } catch (ClassCastException ex) {
                     ClaseConError err = (ClaseConError) o;
@@ -93,7 +98,7 @@ public class EditReservaGUI extends javax.swing.JDialog {
                             n++;
                             this.huespedsBox.addItem(h.getNombre() + " " + h.getApellidos());
                         }
-                        this.huespedsBox.setSelectedIndex(n);
+                        this.huespedsBox.setSelectedIndex(index);
                     }
                 } catch (MalformedURLException ex) {
                     JOptionPane.showMessageDialog(null, "No se encuentra servicio");
@@ -146,7 +151,7 @@ public class EditReservaGUI extends javax.swing.JDialog {
             }
         });
 
-        jButton2.setText("Añadir");
+        jButton2.setText("Editar");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -173,7 +178,7 @@ public class EditReservaGUI extends javax.swing.JDialog {
                             .addComponent(huespedsBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(fechaInicio)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 192, Short.MAX_VALUE)
+                        .addGap(0, 194, Short.MAX_VALUE)
                         .addComponent(jButton2)
                         .addGap(18, 18, 18)
                         .addComponent(jButton1)))
@@ -291,6 +296,7 @@ public class EditReservaGUI extends javax.swing.JDialog {
                 String params
                         = "reserva.fechaInicio=" + Common.dateToStr(fechaInit)
                         + "&reserva.fechaSalida=" + Common.dateToStr(fechaFinish)
+                        + "&reserva.habitacion=" + habitacion
                         + "&reserva.NIF=" + h.getNIF()
                         + "&reserva.oldNIF=" + nif;
 
