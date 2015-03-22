@@ -368,9 +368,9 @@ public class AddHuespedGUI extends javax.swing.JDialog {
                     }
                 }
             } catch (MalformedURLException ex) {
-                Logger.getLogger(AddHuespedGUI.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(null, "No se encuentra servicio");
             } catch (IOException ex) {
-                Logger.getLogger(AddHuespedGUI.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(null, "No se encuentra servicio");
             }
         }
     }//GEN-LAST:event_jButton1ActionPerformed

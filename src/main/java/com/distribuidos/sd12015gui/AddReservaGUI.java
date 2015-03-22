@@ -8,6 +8,7 @@ package com.distribuidos.sd12015gui;
 import com.distribuidos.sd12015.Common;
 import com.distribuidos.sd12015.data.ClaseConError;
 import com.distribuidos.sd12015.data.ClaseConOk;
+import com.distribuidos.sd12015.data.ClaseConOkYDuple;
 import com.distribuidos.sd12015.models.Huesped;
 import static com.distribuidos.sd12015gui.main.DOMAIN;
 import com.thoughtworks.xstream.XStream;
@@ -62,9 +63,9 @@ public class AddReservaGUI extends javax.swing.JDialog {
                 }
             }
         } catch (MalformedURLException ex) {
-            Logger.getLogger(HuespedsGUI.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "No se encuentra servicio");
         } catch (IOException ex) {
-            Logger.getLogger(HuespedsGUI.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "No se encuentra servicio");
         }
 
     }
@@ -272,7 +273,7 @@ public class AddReservaGUI extends javax.swing.JDialog {
                         System.out.println("No se ha podido crear.");
                         this.jButton1.setEnabled(true);
                     } else {
-                        ClaseConOk ok = (ClaseConOk) o;
+                        ClaseConOkYDuple ok = (ClaseConOkYDuple) o;
                         if (ok.isOk()) {
                             JOptionPane.showMessageDialog(null, "Agregado con éxito.");
                             System.out.println("Agregado con éxito.");
@@ -285,11 +286,11 @@ public class AddReservaGUI extends javax.swing.JDialog {
                     }
                 }
             } catch (ParseException ex) {
-                Logger.getLogger(AddReservaGUI.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(null, "Error de parseo");
             } catch (MalformedURLException ex) {
-                Logger.getLogger(AddReservaGUI.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(null, "No se encuentra servicio");
             } catch (IOException ex) {
-                Logger.getLogger(AddReservaGUI.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(null, "No se encuentra servicio");
             }
         }
     }//GEN-LAST:event_jButton2ActionPerformed

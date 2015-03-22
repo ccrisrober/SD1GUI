@@ -5,13 +5,26 @@
  */
 package com.distribuidos.sd12015gui;
 
+import com.distribuidos.sd12015.Common;
+import com.distribuidos.sd12015.data.ClaseConError;
+import com.distribuidos.sd12015.models.Reserva;
+import com.thoughtworks.xstream.XStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.ParseException;
 import java.util.Date;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Cristian
  */
 public class ShowReservaGUI extends javax.swing.JDialog {
+
+    XStream miStream = new XStream();
 
     /**
      * Creates new form ShowReservaGUI
@@ -24,9 +37,47 @@ public class ShowReservaGUI extends javax.swing.JDialog {
     public ShowReservaGUI(java.awt.Frame parent, boolean modal, String nif_, Date date) {
         super(parent, modal);
         initComponents();
-        
-                
-        
+        try {
+            System.out.println(nif);
+            URL url;
+            HttpURLConnection conn;
+            InputStream is;
+            int codigo_http;
+            url = new URL(main.DOMAIN + "VerReserva?NIF=" + nif + "&fechaInicio=" + Common.dateToStr(date));
+            conn = (HttpURLConnection) url.openConnection();
+
+            conn.setRequestProperty("Accept", "text/xml");  // Pedimos formato xml
+
+            is = conn.getInputStream();
+            codigo_http = conn.getResponseCode();
+            if (codigo_http / 100 != 2) {
+                System.out.println("Error HTTP " + codigo_http);
+            } else {
+                Object o = miStream.fromXML(is);
+                try {
+                    Reserva rr = (Reserva) o;
+                    System.out.println(rr);
+
+                    this.nif.setText(rr.getNIF());
+                    this.fechaInicio.setText(Common.dateToStr(rr.getFechaEntrada()));
+                    this.fechaSalida.setText(Common.dateToStr(rr.getFechaSalida()));
+                    this.habitacion.setText(rr.getHabitacion() + "");
+                } catch (ClassCastException ex) {
+                    ClaseConError err = (ClaseConError) o;
+                    JOptionPane.showMessageDialog(null, err.getCodigoError() + " - " + err.getMensajeError());
+                    this.dispose();
+                }
+            }
+        } catch (MalformedURLException ex) {
+            JOptionPane.showMessageDialog(null, "No se encuentra servicio");
+            this.dispose();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "No se encuentra servicio");
+            this.dispose();
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(null, "Fecha incorrecta");
+            this.dispose();
+        }
     }
 
     /**
@@ -55,19 +106,11 @@ public class ShowReservaGUI extends javax.swing.JDialog {
 
         jLabel1.setText("NIF: ");
 
-        nif.setText("jLabel2");
-
         jLabel2.setText("Habitación:");
-
-        habitacion.setText("jLabel3");
 
         jLabel3.setText("Fecha Inicio:");
 
-        fechaInicio.setText("jLabel4");
-
         jLabel4.setText("Fecha Salida:");
-
-        fechaSalida.setText("jLabel5");
 
         jButton1.setText("Salir");
         jButton1.addActionListener(new java.awt.event.ActionListener() {

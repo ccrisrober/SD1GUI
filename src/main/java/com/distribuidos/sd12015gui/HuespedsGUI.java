@@ -64,9 +64,9 @@ public class HuespedsGUI extends javax.swing.JDialog {
                 }
             }
         } catch (MalformedURLException ex) {
-            Logger.getLogger(HuespedsGUI.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "No se encuentra servicio");
         } catch (IOException ex) {
-            Logger.getLogger(HuespedsGUI.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "No se encuentra servicio");
         }
     }
 
@@ -113,7 +113,7 @@ public class HuespedsGUI extends javax.swing.JDialog {
                                 edit.setVisible(true);
                             } else if (event.getActionCommand().compareTo("Borrar") == 0) {
                                 int dialogButton = JOptionPane.YES_NO_OPTION;
-                                int dialogResult = JOptionPane.showConfirmDialog(null, "Your Message", "Title on Box", dialogButton);
+                                int dialogResult = JOptionPane.showConfirmDialog(null, "¿Deseas borrar?", "Peligro", dialogButton);
                                 if (dialogResult == 0) {
                                     try {
                                         System.out.println("Yes option");
@@ -140,18 +140,20 @@ public class HuespedsGUI extends javax.swing.JDialog {
                                             if (o instanceof ClaseConOk) {
                                                 ClaseConOk ok = (ClaseConOk) o;
                                                 if (ok.isOk()) {
-
+                                                    JOptionPane.showMessageDialog(null, "Borrado con éxito");
                                                     updateTable();
+                                                } else {
+                                                    JOptionPane.showMessageDialog(null, "Error al borrar");
                                                 }
                                             } else if (o instanceof ClaseConError) {
                                                 ClaseConError error = (ClaseConError) o;
-                                                System.out.println(error.getMensajeError());
+                                                JOptionPane.showMessageDialog(null, error.getMensajeError());
                                             }
                                         }
                                     } catch (MalformedURLException ex) {
-                                        Logger.getLogger(HuespedsGUI.class.getName()).log(Level.SEVERE, null, ex);
+                                        JOptionPane.showMessageDialog(null, "No se encuentra servicio");
                                     } catch (IOException ex) {
-                                        Logger.getLogger(HuespedsGUI.class.getName()).log(Level.SEVERE, null, ex);
+                                        JOptionPane.showMessageDialog(null, "No se encuentra servicio");
                                     }
 
                                 } else {

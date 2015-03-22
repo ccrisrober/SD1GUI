@@ -116,9 +116,6 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="nif">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="jLabel2"/>
-          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel2">
           <Properties>
@@ -126,9 +123,6 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="habitacion">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="jLabel3"/>
-          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>
@@ -136,9 +130,6 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="fechaInicio">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="jLabel4"/>
-          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel4">
           <Properties>
@@ -146,9 +137,6 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="fechaSalida">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="jLabel5"/>
-          </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="jButton1">
           <Properties>

@@ -5,6 +5,8 @@
  */
 package com.distribuidos.sd12015gui;
 
+import com.distribuidos.sd12015.Common;
+import com.distribuidos.sd12015.data.ClaseConError;
 import com.distribuidos.sd12015.data.ClaseConOk;
 import com.distribuidos.sd12015.models.Reserva;
 import com.thoughtworks.xstream.XStream;
@@ -18,6 +20,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -64,12 +67,12 @@ public class ReservasGUI extends javax.swing.JDialog {
                 }
             }
         } catch (MalformedURLException ex) {
-            Logger.getLogger(HuespedsGUI.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "No se encuentra servicio");
         } catch (IOException ex) {
-            Logger.getLogger(HuespedsGUI.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "No se encuentra servicio");
         }
     }
-    
+
     /**
      * Creates new form ReservasGUI
      */
@@ -109,7 +112,7 @@ public class ReservasGUI extends javax.swing.JDialog {
                                 edit.setVisible(true);
                             } else if (event.getActionCommand().compareTo("Borrar") == 0) {
                                 int dialogButton = JOptionPane.YES_NO_OPTION;
-                                int dialogResult = JOptionPane.showConfirmDialog(null, "Your Message", "Title on Box", dialogButton);
+                                int dialogResult = JOptionPane.showConfirmDialog(null, "¿Deseas borrar?", "Peligro", dialogButton);
                                 if (dialogResult == 0) {
                                     try {
                                         System.out.println("Yes option");
@@ -120,7 +123,7 @@ public class ReservasGUI extends javax.swing.JDialog {
                                         conn.setRequestProperty("Accept", "text/xml");  // Pedimos formato xml
                                         conn.setRequestMethod("POST");
 
-                                        String params = "nif=" + nif + "&fechaInicio=" + date;
+                                        String params = "reserva.NIF=" + nif + "&reserva.fechaInicio=" + Common.dateToStr(date);
                                         conn.setDoOutput(true);
                                         DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
                                         wr.writeBytes(params);
@@ -132,15 +135,27 @@ public class ReservasGUI extends javax.swing.JDialog {
                                         if (codigo_http / 100 != 2) {
                                             System.out.println("Error HTTP " + codigo_http);
                                         } else {
-                                            ClaseConOk ok = (ClaseConOk) miStream.fromXML(is);
-                                            System.out.println(ok.isOk());
+                                            Object o = miStream.fromXML(is);
+                                            if (o instanceof ClaseConOk) {
+                                                ClaseConOk ok = (ClaseConOk) o;
+                                                if (ok.isOk()) {
+                                                    JOptionPane.showMessageDialog(null, "Borrado con éxito");
+                                                    updateTable();
+                                                } else {
+                                                    JOptionPane.showMessageDialog(null, "Error al borrar");
+                                                }
+                                            } else if (o instanceof ClaseConError) {
+                                                ClaseConError error = (ClaseConError) o;
+                                                JOptionPane.showMessageDialog(null, error.getMensajeError());
+                                            }
                                         }
                                     } catch (MalformedURLException ex) {
-                                        Logger.getLogger(HuespedsGUI.class.getName()).log(Level.SEVERE, null, ex);
+                                        JOptionPane.showMessageDialog(null, "No se encuentra servicio");
                                     } catch (IOException ex) {
-                                        Logger.getLogger(HuespedsGUI.class.getName()).log(Level.SEVERE, null, ex);
+                                        JOptionPane.showMessageDialog(null, "No se encuentra servicio");
+                                    } catch (ParseException ex) {
+                                        JOptionPane.showMessageDialog(null, "Fecha incorrecta");
                                     }
-
                                 } else {
                                     System.out.println("No Option");
                                 }
@@ -170,6 +185,7 @@ public class ReservasGUI extends javax.swing.JDialog {
         });
     }
 // An inner class to check whether mouse events are the popup trigger
+
     class MousePopupListener extends MouseAdapter {
 
         public void mousePressed(MouseEvent e) {
