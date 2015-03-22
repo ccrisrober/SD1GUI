@@ -5,26 +5,38 @@
  */
 package com.distribuidos.sd12015.models;
 
+import com.distribuidos.sd12015.Common;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Cristian
  */
-public class Duple<E, F> {
-    public E e;
-    public F f;
+public class Duple {
+    private Date e;
+    private String f;
+    
+    private String converted;
 
-    public Duple(E e, F f) {
+    public Duple(Date e, String f) {
         this.e = e;
         this.f = f;
+        try {
+            this.converted = Common.dateToStr(e);
+        } catch (ParseException ex) {
+            Logger.getLogger(Duple.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    public E getE() {
+    public Date getE() {
         return e;
     }
 
-    public void setE(E e) {
+    public void setE(Date e) {
         this.e = e;
     }
 
@@ -44,21 +56,20 @@ public class Duple<E, F> {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Duple<?, ?> other = (Duple<?, ?>) obj;
-        if (!Objects.equals(this.e, other.e)) {
-            return false;
+        final Duple other = (Duple) obj;
+        if(other.converted.compareToIgnoreCase(this.converted) == 0) {
+            if(other.f.compareToIgnoreCase(this.f) == 0) {
+                return true;
+            }
         }
-        if (!Objects.equals(this.f, other.f)) {
-            return false;
-        }
-        return true;
+        return false;
     }
 
-    public F getF() {
+    public String getF() {
         return f;
     }
 
-    public void setF(F f) {
+    public void setF(String f) {
         this.f = f;
     }
     

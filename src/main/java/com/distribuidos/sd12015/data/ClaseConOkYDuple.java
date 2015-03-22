@@ -14,9 +14,9 @@ import java.util.Date;
  */
 public class ClaseConOkYDuple {
     private boolean ok;
-    private Duple<Date, String> duple;
+    private Duple duple;
 
-    public ClaseConOkYDuple(boolean ok, Duple<Date, String> duple) {
+    public ClaseConOkYDuple(boolean ok, Duple duple) {
         this.ok = ok;
         this.duple = duple;
     }
@@ -29,11 +29,11 @@ public class ClaseConOkYDuple {
         this.ok = ok;
     }
 
-    public Duple<Date, String> getDuple() {
+    public Duple getDuple() {
         return duple;
     }
 
-    public void setDuple(Duple<Date, String> duple) {
+    public void setDuple(Duple duple) {
         this.duple = duple;
     }
     

@@ -16,7 +16,7 @@ public class Domicilio {
     private String provincia;
     
     public Domicilio() {
-        
+        this("", "", 0, "");
     }
 
     public Domicilio(String direccion, String localidad, int codigoPostal, String provincia) {

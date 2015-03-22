@@ -7,7 +7,7 @@ package com.distribuidos.sd12015gui;
 
 import com.distribuidos.sd12015.Common;
 import com.distribuidos.sd12015.data.ClaseConError;
-import com.distribuidos.sd12015.data.ClaseConOk;
+import com.distribuidos.sd12015.data.ClaseConOkYDuple;
 import com.distribuidos.sd12015.models.Huesped;
 import com.distribuidos.sd12015.models.Reserva;
 import static com.distribuidos.sd12015gui.main.DOMAIN;
@@ -318,10 +318,10 @@ public class EditReservaGUI extends javax.swing.JDialog {
                         System.out.println("No se ha podido crear.");
                         this.jButton1.setEnabled(true);
                     } else {
-                        ClaseConOk ok = (ClaseConOk) o;
+                        ClaseConOkYDuple ok = (ClaseConOkYDuple) o;
                         if (ok.isOk()) {
                             JOptionPane.showMessageDialog(null, "Agregado con éxito.");
-                            System.out.println("Agregado con éxito.");
+                            System.out.println("Modificado con éxito.");
                             this.dispose();
                         } else {
                             JOptionPane.showMessageDialog(null, "No se ha podido crear.");

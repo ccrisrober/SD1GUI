@@ -7,7 +7,6 @@ package com.distribuidos.sd12015gui;
 
 import com.distribuidos.sd12015.Common;
 import com.distribuidos.sd12015.data.ClaseConError;
-import com.distribuidos.sd12015.data.ClaseConOk;
 import com.distribuidos.sd12015.data.ClaseConOkYDuple;
 import com.distribuidos.sd12015.models.Huesped;
 import static com.distribuidos.sd12015gui.main.DOMAIN;

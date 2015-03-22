@@ -163,13 +163,13 @@ public class ReservasGUI extends javax.swing.JDialog {
                         }
                     };
                     JMenuItem item;
-                    popup.add(item = new JMenuItem("Ver", new ImageIcon("1.gif")));
+                    popup.add(item = new JMenuItem("Ver", new ImageIcon("1.png")));
                     item.setHorizontalTextPosition(JMenuItem.RIGHT);
                     item.addActionListener(menuListener);
-                    popup.add(item = new JMenuItem("Editar", new ImageIcon("2.gif")));
+                    popup.add(item = new JMenuItem("Editar", new ImageIcon("2.png")));
                     item.setHorizontalTextPosition(JMenuItem.RIGHT);
                     item.addActionListener(menuListener);
-                    popup.add(item = new JMenuItem("Borrar", new ImageIcon("3.gif")));
+                    popup.add(item = new JMenuItem("Borrar", new ImageIcon("3.png")));
                     item.setHorizontalTextPosition(JMenuItem.RIGHT);
                     item.addActionListener(menuListener);
 
@@ -187,14 +187,17 @@ public class ReservasGUI extends javax.swing.JDialog {
 
     class MousePopupListener extends MouseAdapter {
 
+        @Override
         public void mousePressed(MouseEvent e) {
             checkPopup(e);
         }
 
+        @Override
         public void mouseClicked(MouseEvent e) {
             checkPopup(e);
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             checkPopup(e);
         }
